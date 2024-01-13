@@ -1,12 +1,28 @@
-const editItem = () => {
+import EditItemComponent from '@/components/editItemComponent'
+import { useRouter } from "next/navigation";
+import dotenv from "dotenv";
+
+dotenv.config()
+
+const fetchItem = async (id) => {
+    try {
+        const response = await fetch(`${process.env.API_URL}/api/items/${id}`, {cache: "no-store"});
+        if(!response.ok) {
+            throw new Error("Error occurred while fetching item")
+        }
+        return response.json();
+    } catch (error) {
+        console.log("Error while fetching item: ", error);
+    }
+}
+
+const editItem = async ({params}) => {
+    const {id} = params;
+    const {item} = await fetchItem(id)
+    const {title, desc} = item
+
     return (
-        <div>
-            <form className="flex flex-col mt-2 gap-3" action="">
-                <input className="border border-orange-500 px-7 py-2 rounded-lg" type="text" placeholder="Item title"/>
-                <input className="border border-orange-500 px-7 py-2 rounded-lg" type="text" placeholder="Item description"/>
-                <button className="bg-orange-500 font-bold text-white px-7 py-2 rounded-lg w-fit">Update</button>
-            </form>
-        </div>
+        <EditItemComponent id={id} title={title} desc={desc} />
     );
 }
 
